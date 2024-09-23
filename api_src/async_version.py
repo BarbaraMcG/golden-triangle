@@ -4,6 +4,8 @@ import os
 import json
 import pandas as pd
 from pyalex import Works
+import time
+from pathlib import Path
 
 # Constants
 BASE_URL = "https://api.openalex.org/works"
@@ -21,8 +23,12 @@ DOWNLOAD_DIR = os.path.join(OUTPUT_DIR, 'downloads')
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
+DATA_DIR = Path('data')
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 def extract_doi(doi_url):
     return doi_url.replace('https://doi.org/', '').replace('/', '_')
+    
 
 
 async def fetch_data(session, page):
@@ -67,7 +73,7 @@ async def download_file(session, url, filename):
     except Exception as e:
         return False
 
-async def process_data(session, page):
+async def process_data(page):
     """
     Processes data from a specified page by first fetching the data and then parsing it.
     Extracts relevant information and attempts to download associated HTML content if available.
@@ -80,58 +86,72 @@ async def process_data(session, page):
     list: A list of dictionaries containing parsed data for each record.
     int: The count of entries for which HTML content could not be downloaded.
     """
-    try:
-        results = await fetch_data(session, page)
-    except Exception as e:
-        print(f"Error fetching data for page {page}: {e}")
-        return [], 0
-    data_list = []
-    missing_html_count = 0
-    for result in results['results']:
+    print(f'Page {page}: started processing ...')
+    PAGE_FN = DATA_DIR / str(page)
+    if PAGE_FN.exists():
+        obj = json.loads(PAGE_FN.read_text())
+        print(f'Page {page}: file found, ignored.')
+        return obj['data_list'], obj['missing_html_count']
+
+    start_time = time.time()
+    print(f'Page {page}: start_time={start_time}')
+    async with aiohttp.ClientSession() as session: 
         try:
-            id = result.get('id')
-            doi = result.get('doi')
-            title = result.get('title')
-            abstract = Works()[result['id']]['abstract']
-            publication_date = result.get('publication_date')
-            authors = [{'Name': a_info.get('author', {}).get('display_name'), 
-                        'ORCID': a_info.get('author', {}).get('orcid'), 
-                        'Institutions': [inst.get('display_name') for inst in a_info.get('institutions', [])]} 
-                    for a_info in result.get('authorships', [])]
-            primary_location = result.get('primary_location', {})
-            locations = result.get('locations', [])
-            source_display_name = ''
-            try:
-                best_oa = result.get('best_oa_location', {})
-                if best_oa:
-                    source = best_oa.get('source', {})
-                    if source:
-                        source_display_name = source.get('display_name', '')
-            except Exception as e:
-                print(f"Error fetching best OA location source display name: {e}")
-            landing_page = primary_location.get('landing_page_url')
-            html_missing = not landing_page or not await download_file(session, landing_page, f"{extract_doi(doi)}.html")
-            missing_html_count += html_missing
-            data_list.append({
-                'ID': id, 'DOI': doi, 'Title': title, 'Abstract': abstract, 
-                'Publication Date': publication_date, 'Authors': authors, 
-                'Total Citations': result.get('cited_by_count'),
-                'Cited By Year': result.get('counts_by_year', []), 
-                'Mesh': result.get('mesh', []), 
-                'Referenced Count': result.get('referenced_works_count'),
-                'Referenced Works': result.get('referenced_works', []), 
-                'Countries Count': result.get('countries_distinct_count'),
-                'Institutions Count': result.get('institutions_distinct_count'), 
-                'Corresponding Institution IDs': result.get('corresponding_institution_ids', []),
-                'Locations': locations,
-                'Source Display Name': source_display_name,
-                'Topics': [{'ID': topic.get('id'), 'Name': topic.get('display_name')} for topic in result.get('topics', [])],
-                'Landing Page URL': landing_page, 'HTML Missing': html_missing
-            })
+            results = await fetch_data(session, page)
         except Exception as e:
-            print(f"Error processing result {result}: {e}")
-            continue
-    return data_list, missing_html_count
+            print(f"Error fetching data for page {page}: {e}")
+            return [], 0
+        data_list = []
+        missing_html_count = 0
+        for result in results['results']:
+            try:
+                id = result.get('id')
+                doi = result.get('doi')
+                title = result.get('title')
+                abstract = Works()[result['id']]['abstract']
+                publication_date = result.get('publication_date')
+                authors = [{'Name': a_info.get('author', {}).get('display_name'), 
+                            'ORCID': a_info.get('author', {}).get('orcid'), 
+                            'Institutions': [inst.get('display_name') for inst in a_info.get('institutions', [])]} 
+                        for a_info in result.get('authorships', [])]
+                primary_location = result.get('primary_location', {})
+                locations = result.get('locations', [])
+                source_display_name = ''
+                try:
+                    best_oa = result.get('best_oa_location', {})
+                    if best_oa:
+                        source = best_oa.get('source', {})
+                        if source:
+                            source_display_name = source.get('display_name', '')
+                except Exception as e:
+                    print(f"Error fetching best OA location source display name: {e}")
+                landing_page = primary_location.get('landing_page_url')
+                html_missing = not landing_page or not await download_file(session, landing_page, f"{extract_doi(doi)}.html")
+                missing_html_count += html_missing
+                data_list.append({
+                    'ID': id, 'DOI': doi, 'Title': title, 'Abstract': abstract, 
+                    'Publication Date': publication_date, 'Authors': authors, 
+                    'Total Citations': result.get('cited_by_count'),
+                    'Cited By Year': result.get('counts_by_year', []), 
+                    'Mesh': result.get('mesh', []), 
+                    'Referenced Count': result.get('referenced_works_count'),
+                    'Referenced Works': result.get('referenced_works', []), 
+                    'Countries Count': result.get('countries_distinct_count'),
+                    'Institutions Count': result.get('institutions_distinct_count'), 
+                    'Corresponding Institution IDs': result.get('corresponding_institution_ids', []),
+                    'Locations': locations,
+                    'Source Display Name': source_display_name,
+                    'Topics': [{'ID': topic.get('id'), 'Name': topic.get('display_name')} for topic in result.get('topics', [])],
+                    'Landing Page URL': landing_page, 'HTML Missing': html_missing
+                })
+            except Exception as e:
+                print(f"Error processing result {result}: {e}")
+                continue
+        
+        PAGE_FN.write_text(json.dumps({'data_list': data_list, 'missing_html_count': missing_html_count}))
+        end_time = time.time()
+        print(f'Page {page}: end_time={end_time}, run_time={end_time - start_time}')
+        return data_list, missing_html_count
 
 def load_checkpoint():
     """
@@ -171,26 +191,30 @@ def save_summary(summary):
         json.dump(summary, f, indent=2)
 
 async def main():
-    async with aiohttp.ClientSession() as session:
-        checkpoint = load_checkpoint()
-        last_page_processed = checkpoint['last_page_processed']
-        current_page = last_page_processed + 1
-        all_data = []
-        cumulative_summary = load_summary()
-        # Currently set to a limit
-        while current_page <= 100:
-            data, missing_html_count = await process_data(session, current_page)
+    all_data = []
+    START_PAGE = 1
+    LAST_PAGE = 1000 # excluding
+    BATCH_SIZE = 10
+    
+    cumulative_summary = {'Total Entries': 0, 'Total Missing HTML': 0}
+    
+    for start_range in range(START_PAGE, LAST_PAGE, BATCH_SIZE):
+        tasks = []
+        for current_page in range(start_range, start_range + BATCH_SIZE): 
+            if current_page == LAST_PAGE:
+                break
+            tasks.append(process_data(current_page)) 
+            
+        results = await asyncio.gather(*tasks)
+        for data, missing_html_count in results:
             all_data.extend(data)
             cumulative_summary['Total Entries'] += len(data)
             cumulative_summary['Total Missing HTML'] += missing_html_count
-            save_checkpoint({'last_page_processed': current_page})
-            current_page += 1
 
-        df = pd.DataFrame(all_data)
-        df.to_csv(OUTPUT_FILE, index=False, mode='a', header=not os.path.exists(OUTPUT_FILE))
-        save_summary(cumulative_summary)
-        print(f"Total entries processed: {cumulative_summary['Total Entries']}")
-        print(f"Total missing HTML files: {cumulative_summary['Total Missing HTML']}")
+    df = pd.DataFrame(all_data)
+    df.to_csv(OUTPUT_FILE, index=False, mode='a', header=not os.path.exists(OUTPUT_FILE))
+    print(f"Total entries processed: {cumulative_summary['Total Entries']}")
+    print(f"Total missing HTML files: {cumulative_summary['Total Missing HTML']}")
 
 if __name__ == '__main__':
     asyncio.run(main())
