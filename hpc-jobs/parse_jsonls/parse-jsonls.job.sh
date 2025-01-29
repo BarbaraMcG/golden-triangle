@@ -12,4 +12,4 @@ ml python
 export PATH=$HOME/bin:$PATH
 # source .venv/bin/activate
 
-python3 /users/k21191796/golden-triangle/hpc-jobs/parse_jsonls/parse_jsonl.py
+python3 $HOME/golden-triangle/hpc-jobs/parse_jsonls/parse_jsonl.py

@@ -1,0 +1,123 @@
+Data Science Journal
+Applied Informatics
+Aquatic Biosystems
+Biodiversity Data Journal
+Biology of Sex Differences
+BioRisk
+BMC Anesthesiology
+BMC Biochemistry
+BMC Bioinformatics
+BMC Biology
+BMC Biophysics
+BMC Biotechnology
+BMC Cancer
+BMC Cardiovascular Disorders
+BMC Cell Biology
+BMC Clinical Pathology
+BMC Complementary and Alternative Medicine
+BMC Dermatology
+BMC Developmental Biology
+BMC Ear, Nose and Throat Disorders
+BMC Ecology
+BMC Emergency Medicine
+BMC Endocrine Disorders
+BMC Evolutionary Biology
+BMC Family Practice
+BMC Gastroenterology
+BMC Genetics
+BMC Genomics
+BMC Geriatrics
+BMC Health Services Research
+BMC Hematology
+BMC Immunology
+BMC Infectious Diseases
+BMC International Health and Human Rights
+BMC Medical Education
+BMC Medical Ethics
+BMC Medical Genetics
+BMC Medical Genomics
+BMC Medical Imaging
+BMC Medical Informatics and Decision Making
+BMC Medical Physics
+BMC Medical Research Methodology
+BMC Medicine
+BMC Microbiology
+BMC Molecular Biology
+BMC Musculoskeletal Disorders
+BMC Nephrology
+BMC Neurology
+BMC Neuroscience
+BMC Nursing
+BMC Obesity
+BMC Ophthalmology
+BMC Oral Health
+BMC Palliative Care
+BMC Pediatrics
+BMC Pharmacology and Toxicology
+BMC Physiology
+BMC Plant Biology
+BMC Pregnancy and Childbirth
+BMC Psychiatry
+BMC Psychology
+BMC Public Health
+BMC Pulmonary Medicine
+BMC Research Notes
+BMC Sports Science, Medicine and Rehabilitation
+BMC Structural Biology
+BMC Surgery
+BMC Systems Biology
+BMC Urology
+BMC Veterinary Research
+BMC Women's Health
+Botanical Studies
+Cell & Bioscience
+Chemistry Central Journal, now BMC Chemistry
+Chiropractic & Manual Therapies
+Database
+Data in Brief
+Dataset Papers in Science
+Diagnostic Pathology
+Earth Perspectives
+Earth System Science Data
+Ecology
+EvoDevo
+F1000 Research
+Genome Medicine
+Genomics Data
+Geoscience Data Journal
+Gigabyte Journal
+GigaScience
+Health and Justice
+Health Information Science and Systems
+Human Genomics
+In Silico Pharmacology
+International Journal of Data Science and Analytics
+International Journal of Food Contamination
+International Journal of Robotics Research
+Irish Veterinary Journal
+Journal of Applied Volcanology
+Journal of Biomedical Semantics
+Journal of Cheminformatics
+Journal of Clinical Bioinformatics
+Journal of Occupational Medicine and Toxicology
+Journal of Open Archaelogy Data
+Journal of Open Humanities Data
+Journal of Open Psychology Data
+Journal of Open Public Health Data
+Journal of Systems Chemistry
+Journal of the International Society of Sports Nutrition
+Microbial Informatics and Experimentation
+Movement Ecology
+MycoKeys
+Nature Conservation
+NeoBiota
+Neuroinformatics
+PhytoKeys
+Plant Methods
+PlosONE
+Research Data Journal for the Humanities and Social Sciences
+Scientific Data
+SpringerPlus
+Substance Abuse Treatment, Prevention, and Policy
+Theoretical Biology and Medical Modelling
+ZooKeys

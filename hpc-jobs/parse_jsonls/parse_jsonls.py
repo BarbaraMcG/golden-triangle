@@ -31,7 +31,7 @@ def filter_jsonl_gz(gz_file_path, output_file, folder, gz_name):
 
 # DFS traversal and processing
 def process_gz_files():
-    output_filtered_file = "/scratch_tmp/prj/dh_golden_triangle/filtered_results.jsonl"
+    output_filtered_file = "/scratch_tmp/prj/dh_golden_triangle/results_2022.jsonl"
     all_gz_files = list(source_dir.rglob("*.gz"))
     for i, gz_file in enumerate(all_gz_files):
         print(f'{i}/{len(all_gz_files)}')
@@ -42,4 +42,4 @@ def process_gz_files():
 # Run the processing function
 if __name__ == "__main__":
     process_gz_files()
-    print("Processing complete. Filtered results saved in /scratch_tmp/prj/dh_golden_triangle/filtered_results.jsonl.")
+    print("Processing complete. Filtered results saved in /scratch_tmp/prj/dh_golden_triangle/results_2022.jsonl.")
