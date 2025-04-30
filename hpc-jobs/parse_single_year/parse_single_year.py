@@ -36,7 +36,7 @@ def get_single_jsonl_output(work: dict):
             in DATA_JOURNALS)
 
     if 'abstract_inverted_index' in work and work['abstract_inverted_index'] is not None:
-        work['gt_abstract'] = re_invert_abstract(work['abstract_inverted_index'])
+        work['cd'] = re_invert_abstract(work['abstract_inverted_index'])
     return work
     
 
