@@ -10,13 +10,18 @@ mkdir /root/.ssh
 apt-get update
 apt-get install -y python3-pip python3-venv curl ca-certificates jq ssh vim
 cd
+
+# add dns1.kcl.ac.uk, needed to resolve docs.er.kcl.ac.uk and later openstack cli commands auth url
+echo "nameserver 137.73.254.10" > /etc/resolv.conf
+
 curl -OJ https://docs.er.kcl.ac.uk/resources/KCL-ER-Root-CA.crt
 cp KCL-ER-Root-CA.crt /usr/local/share/ca-certificates
 update-ca-certificates
-openssl x509 -in KCL-ER-Root-CA.crt -text >> .venv/lib/python3.12/site-packages/certifi/cacert.pem
-pip install python-openstackclient
 python3 -m venv .venv
-security group create allow_all
+pip install python-openstackclient
+openssl x509 -in KCL-ER-Root-CA.crt -text >> .venv/lib/python3.12/site-packages/certifi/cacert.pem
+
+openstack security group create allow_all
 openstack security group rule create \
   --protocol any \
   --ingress \
@@ -35,6 +40,9 @@ openstack security group rule create \
   --ingress --protocol tcp --dst-port 22 \
   --remote-ip 0.0.0.0/0 \
   allow_ssh
+
+
+apt install openvpn -y
 ```
 
 # Evrytime usage
@@ -70,8 +78,15 @@ openstack --os-cloud=openstack server show my-server -f value -c addresses
 
 ## Connect to a VM
 ```bash
+# https://docs.er.kcl.ac.uk/CREATE/tools/openvpn/ to download kcl-laptop.ovpn
+sudo openvpn --config kcl-laptop.ovpn
+cd openstack
 vm_ip=$(openstack server show my-server -f json -c addresses | jq -r ".addresses.external_4003.[0]")
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/create_cloud ubuntu@$vm_ip
+
+# for vscode (when openvpn runs in wsl)
+ssh -N -L 0.0.0.0:2222:$vm_ip:22 ubuntu@$vm_ip -i ~/.ssh/create_cloud
+cat ../.deploy-key | ssh -i ~/.ssh/create_cloud ubuntu@$vm_ip 'mkdir -p ~/.ssh && cat > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa'
 ```
 
 ## Delete a VM
