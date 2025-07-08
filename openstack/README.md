@@ -80,13 +80,14 @@ openstack --os-cloud=openstack server show my-server -f value -c addresses
 ```bash
 # https://docs.er.kcl.ac.uk/CREATE/tools/openvpn/ to download kcl-laptop.ovpn
 sudo openvpn --config kcl-laptop.ovpn
+update resolve.conf to use openvpn dns (172.17.6.79) (or 137.73.254.10)
 cd openstack
 vm_ip=$(openstack server show my-server -f json -c addresses | jq -r ".addresses.external_4003.[0]")
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/create_cloud ubuntu@$vm_ip
 
 # for vscode (when openvpn runs in wsl)
-ssh -N -L 0.0.0.0:2222:$vm_ip:22 ubuntu@$vm_ip -i ~/.ssh/create_cloud
 cat ../.deploy-key | ssh -i ~/.ssh/create_cloud ubuntu@$vm_ip 'mkdir -p ~/.ssh && cat > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa'
+ssh -N -L 0.0.0.0:2222:$vm_ip:22 ubuntu@$vm_ip -i ~/.ssh/create_cloud
 ```
 
 ## Delete a VM
@@ -109,4 +110,27 @@ sudo chmod 600 /etc/smb_creds
 sudo mkdir -p /hpc/scratch/prj/dh_golden_triangle
 echo "//smb.create.kcl.ac.uk/hpc/scratch/prj/dh_golden_triangle /hpc/scratch/prj/dh_golden_triangle cifs credentials=/etc/smb_creds 0 0" | sudo tee -a /etc/fstab > /dev/null
 sudo mount /hpc/scratch/prj/dh_golden_triangle
+```
+
+# Connect to HPC (as a recap)
+```bash
+cat >> ~/.ssh/config <<EOF
+Host create
+    Hostname hpc.create.kcl.ac.uk
+    User 21191796
+    PubkeyAuthentication yes
+    IdentityFile ~/.ssh/create_cloud
+EOF
+
+if in vpn
+fix resolve.conf
+
+approve mfa
+
+ssh create
+```
+
+# Copy from VM
+```bash
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/create_cloud ubuntu@$vm_ip:/home/ubuntu/file.zip .
 ```
