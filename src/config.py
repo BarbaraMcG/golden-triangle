@@ -1,0 +1,3 @@
+FULL_TEXT_ROOT_DIR = '...'
+DUMP_ROOT_DIR = '...'
+DUCKDB_FILE = '...'
